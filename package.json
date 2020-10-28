@@ -1,7 +1,6 @@
 {
   "name": "vintedauth",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -19,5 +18,15 @@
     "express-formidable": "^1.2.0",
     "mongoose": "^5.10.9",
     "uid2": "0.0.3"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MaloLebrin/vintedclone.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MaloLebrin/vintedclone/issues"
+  },
+  "homepage": "https://github.com/MaloLebrin/vintedclone#readme",
+  "description": ""
 }

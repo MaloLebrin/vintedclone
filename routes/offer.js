@@ -101,7 +101,7 @@ router.put("/offer/update", isAuthenticated, async (req, res) => {
         if (offer) {
             if (image) {
                 //si j'ai une image à modifier
-                cloudinary.uploader.upload(
+                await cloudinary.uploader.upload(
                     image,
                     { folder: `vinted/offers/` },
                     async (error, result) => {
