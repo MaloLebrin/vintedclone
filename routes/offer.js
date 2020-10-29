@@ -168,7 +168,7 @@ router.get("/offers", async (req, res) => {
             .sort({ product_price: sort ? 1 : null })
             .limit({ limit: limit ? limit : 5 }) //dynamique et par default 5
             .skip((pages - 1) * limit);
-        const count = await offer.countDocuments(offers); // pour gérer la nombre de doc dans la recherche
+        const count = await Offer.countDocuments(offers); // pour gérer la nombre de doc dans la recherche
 
         res.status(200).json({ count: count, offers: offers });
     } catch (error) {
