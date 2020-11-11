@@ -149,30 +149,40 @@ router.put("/offer/update", isAuthenticated, async (req, res) => {
 });
 
 router.get("/offers", async (req, res) => {
-    try {
-        const { title, priceMin, priceMax, page, sort } = req.query;
-        const pages = Number(page);
-        const limit = Number(req.query.limit); // pour rendre dynamique limite
+    if (req.query) {
 
-        if (page < 1) {
-            pages = 1;
-        } else {
-            pages = Number(req.query.page);
+        try {
+            const { title, priceMin, priceMax, page, sort } = req.query;
+            const pages = Number(page);
+            const limit = Number(req.query.limit); // pour rendre dynamique limite
+
+            if (page < 1) {
+                pages = 1;
+            } else {
+                pages = Number(req.query.page);
+            }
+            const searchByName = new RegExp(title, "i");
+            const offers = await Offer.find({
+                product_price: { $lte: priceMax ? priceMax : 10000000 },
+                product_price: { $gte: priceMin ? priceMin : 0 },
+                product_name: searchByName ? searchByName : null,
+            })
+                .sort({ product_price: sort ? 1 : null })
+                .limit({ limit: limit ? limit : 5 }) //dynamique et par default 5
+                .skip((pages - 1) * limit);
+            const count = await Offer.countDocuments(offers); // pour gérer la nombre de doc dans la recherche
+
+            res.status(200).json({ count: count, offers: offers });
+        } catch (error) {
+            res.status(400).json({ error: error.message });
         }
-        const searchByName = new RegExp(title, "i");
-        const offers = await Offer.find({
-            product_price: { $lte: priceMax ? priceMax : 10000000 },
-            product_price: { $gte: priceMin ? priceMin : 0 },
-            product_name: searchByName ? searchByName : null,
-        })
-            .sort({ product_price: sort ? 1 : null })
-            .limit({ limit: limit ? limit : 5 }) //dynamique et par default 5
-            .skip((pages - 1) * limit);
-        const count = await Offer.countDocuments(offers); // pour gérer la nombre de doc dans la recherche
-
-        res.status(200).json({ count: count, offers: offers });
-    } catch (error) {
-        res.status(400).json({ error: error.message });
+    } else {
+        try {
+            const offers = await Offer.find()
+            res.status(200).json(offers)
+        } catch (error) {
+            res.status(400).json({ error: error.message });
+        }
     }
 });
 
