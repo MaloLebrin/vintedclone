@@ -22,7 +22,9 @@ const userRoutes = require("./routes/user");
 const offerRoutes = require("./routes/offer");
 app.use(userRoutes);
 app.use(offerRoutes);
-
+app.get('/', (req, res) => {
+    res.send("it's working");
+})
 app.all("*", (req, res) => {
     console.log("route not found");
     res.status(404).json("route not found");
