@@ -60,7 +60,7 @@ router.post("/offer/publish", isAuthenticated, async (req, res) => {
             } catch (error) {
                 return res.json({ error: error.message });
             }
-        });
+        }); // forEach s'arrête
         newOffer.pictures = results;
         await newOffer.save();
         return res.status(200).json("offre publiée");
