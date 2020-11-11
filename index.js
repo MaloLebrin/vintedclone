@@ -12,7 +12,7 @@ app.use(
 );
 app.use(cors());
 
-mongoose.connect(process.env.MONGODB_URL, {
+mongoose.connect("mongodb://localhost:27017/vinted", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
@@ -29,6 +29,6 @@ app.all("*", (req, res) => {
     console.log("route not found");
     res.status(404).json("route not found");
 });
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT || 3001, () => {
     console.log("Server Started");
 });

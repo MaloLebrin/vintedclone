@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const cloudinary = require("cloudinary").v2;
+require("dotenv").config;
+
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY, //ce sont bien mes données.
-    api_secret: process.env.CLOUDINARY_API_SECRET,
+    cloud_name: "malolebrin",
+    api_key: "212971842325324", //ce sont bien mes données.
+    api_secret: "79KqyVOwveSqV7PGkTcez9btus4",
 });
 
 const User = require("../model/User");
@@ -55,15 +57,17 @@ router.post("/offer/publish", isAuthenticated, async (req, res) => {
                 };
                 if (Object.keys(results).length === fileKeys.length) {
                     // tous les uploads sont terminés, on peut donc envoyer la réponse au client
+                    newOffer.pictures = results;
+                    await newOffer.save()
                     return res.json(results);
                 }
+                // console.log(results.push(result));
+
             } catch (error) {
-                return res.json({ error: error.message });
+                res.json({ error: error.message });
             }
         }); // forEach s'arrête
-        newOffer.pictures = results;
-        await newOffer.save();
-        return res.status(200).json("offre publiée");
+        // return res.status(200).json("offre publiée");
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -153,8 +157,8 @@ router.get("/offers", async (req, res) => {
 
         try {
             const { title, priceMin, priceMax, page, sort } = req.query;
-            const pages = Number(page);
-            const limit = Number(req.query.limit); // pour rendre dynamique limite
+            let pages = Number(page);
+            let limit = Number(req.query.limit); // pour rendre dynamique limite
 
             if (page < 1) {
                 pages = 1;
@@ -166,9 +170,12 @@ router.get("/offers", async (req, res) => {
                 product_price: { $lte: priceMax ? priceMax : 10000000 },
                 product_price: { $gte: priceMin ? priceMin : 0 },
                 product_name: searchByName ? searchByName : null,
+            }).populate({
+                path: "owner",
+                select: "account",
             })
                 .sort({ product_price: sort ? 1 : null })
-                .limit({ limit: limit ? limit : 5 }) //dynamique et par default 5
+                .limit((limit ? limit : 10)) //dynamique et par default 5
                 .skip((pages - 1) * limit);
             const count = await Offer.countDocuments(offers); // pour gérer la nombre de doc dans la recherche
 
