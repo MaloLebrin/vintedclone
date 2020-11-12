@@ -25,27 +25,46 @@ router.post("/user/signup", async (req, res) => {
                 const token = uid2(16);
                 const hash = await SHA256(password + salt).toString(encBase64);
                 const image = req.files.pictures.path;
+                if (image) {
+                    await cloudinary.uploader.upload(
+                        image,
+                        async (error, result) => {
+                            // console.log(result, error);
 
-                await cloudinary.uploader.upload(
-                    image,
-                    async (error, result) => {
-                        // console.log(result, error);
-
-                        const newUser = await new User({
-                            email,
-                            account: {
-                                username,
-                                phone,
-                                avatar: result,
-                            },
-                            hash,
-                            token, //ces deux synthaxes sont identiques
-                            salt: salt, //ces deux synthaxes sont identiques
-                        });
-                        await newUser.save();
-                        return res.status(200).json(newUser);
-                    }
-                );
+                            const newUser = await new User({
+                                email,
+                                account: {
+                                    username,
+                                    phone,
+                                    avatar: result,
+                                },
+                                hash,
+                                token, //ces deux synthaxes sont identiques
+                                salt: salt, //ces deux synthaxes sont identiques
+                            });
+                            await newUser.save();
+                            return res.status(200).json(newUser);
+                        }
+                    );
+                } else {
+                    const newUser = await new User({
+                        email,
+                        account: {
+                            username,
+                            phone,
+                            avatar: result,
+                        },
+                        hash,
+                        token, //ces deux synthaxes sont identiques
+                        salt: salt, //ces deux synthaxes sont identiques
+                    });
+                    await newUser.save();
+                    return res.status(200).json({
+                        token: user.token,
+                        account: user.account,
+                        email: user.email
+                    });
+                }
             } else {
                 return res.status(500).json({ message: "username manquant" });
             }
