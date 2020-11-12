@@ -18,7 +18,7 @@ router.post("/user/signup", async (req, res) => {
         const { email, username, phone, password } = req.fields;
         const allUser = await User.findOne({ email });
         if (allUser) {
-            res.status(409).json("mail already exist");
+            return res.status(409).json("mail already exist");
         } else {
             if (username && email && password) {
                 const salt = uid2(16);
@@ -29,7 +29,7 @@ router.post("/user/signup", async (req, res) => {
                 await cloudinary.uploader.upload(
                     image,
                     async (error, result) => {
-                        console.log(result, error);
+                        // console.log(result, error);
 
                         const newUser = await new User({
                             email,
@@ -43,15 +43,15 @@ router.post("/user/signup", async (req, res) => {
                             salt: salt, //ces deux synthaxes sont identiques
                         });
                         await newUser.save();
-                        res.status(200).json({ message: "compte créé" });
+                        return res.status(200).json(newUser);
                     }
                 );
             } else {
-                res.status(500).json({ message: "username manquant" });
+                return res.status(500).json({ message: "username manquant" });
             }
         }
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        return res.status(400).json({ error: error.message });
     }
 });
 
