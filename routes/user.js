@@ -64,17 +64,19 @@ router.post("/user/login", async (req, res) => {
                 encBase64
             );
             if (user.hash === newHash) {
-                res.status(200).json(
-                    "bon mdp vous vous connectez " + user.token
-                );
+                return res.status(200).json({
+                    token: user.token,
+                    account: user.account,
+                    email: user.email
+                });
             } else {
-                res.status(401).json("entrez le bon mdp");
+                return res.status(401).json("entrez le bon mdp");
             }
         } else {
-            res.status(400).json(`entrez le bon mail d'utilisateur`);
+            return res.status(400).json(`entrez le bon mail d'utilisateur`);
         }
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        return res.status(400).json({ error: error.message });
     }
 });
 
