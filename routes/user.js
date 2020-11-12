@@ -15,6 +15,7 @@ const User = require("../model/User");
 
 router.post("/user/signup", async (req, res) => {
     try {
+        console.log(req.fields);
         const { email, username, phone, password } = req.fields;
         const allUser = await User.findOne({ email });
         if (allUser) {
@@ -24,8 +25,8 @@ router.post("/user/signup", async (req, res) => {
                 const salt = uid2(16);
                 const token = uid2(16);
                 const hash = await SHA256(password + salt).toString(encBase64);
-                const image = req.files.pictures.path;
-                if (image) {
+                if (req.files.pictures) {
+                    const image = req.files.pictures.path;
                     await cloudinary.uploader.upload(
                         image,
                         async (error, result) => {
@@ -51,18 +52,16 @@ router.post("/user/signup", async (req, res) => {
                         email,
                         account: {
                             username,
-                            phone,
-                            avatar: result,
                         },
                         hash,
-                        token, //ces deux synthaxes sont identiques
-                        salt: salt, //ces deux synthaxes sont identiques
+                        token,
+                        salt: salt,
                     });
                     await newUser.save();
                     return res.status(200).json({
-                        token: user.token,
-                        account: user.account,
-                        email: user.email
+                        token: newUser.token,
+                        account: newUser.account,
+                        email: newUser.email
                     });
                 }
             } else {
