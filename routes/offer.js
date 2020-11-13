@@ -157,52 +157,38 @@ router.get("/offers", async (req, res) => {
     if (req.query) {
 
         try {
-            let filters = {};
-            if (title || priceMax || priceMin) {
-                filters = {
-                    product_name: new RegExp(title, "i"),
-                    product_price: {
-                        $lte: priceMax ? priceMax : 10000,
-                        $gte: priceMin ? priceMin : 0,
-                    },
-                };
+            let pages = Number(page);
+            let limit = Number(req.query.limit); // pour rendre dynamique limite
+
+            if (page < 1) {
+                pages = 1;
+            } else {
+                pages = Number(req.query.page);
             }
+            const searchByName = new RegExp(title, "i");
+            const offers = await Offer.find({
+                product_price: { $lte: priceMax ? priceMax : 10000000 },
+                product_price: { $gte: priceMin ? priceMin : 0 },
+                product_name: searchByName ? searchByName : null,
+            }).populate({
+                path: "owner",
+                select: "account",
+            })
+                .sort({ product_price: sort ? 1 : null })
+                .limit((limit ? limit : 10)) //dynamique et par default 5
+                .skip((pages - 1) * limit);
+            const count = await Offer.countDocuments(offers); // pour gérer la nombre de doc dans la recherche
 
-            let sortByPrice = {};
-            if (sort) {
-                sortByPrice = { product_price: sort };
-            }
-
-            let skip = 0;
-            const limit = 5;
-            if (page > 1) {
-                skip = page * limit - limit;
-            }
-
-            const count = await Offer.countDocuments(filters);
-
-            const result = await Offer.find(filters)
-                .populate({
-                    path: "owner",
-                    select: "account email",
-                })
-                .select(
-                    "product_name product_details product_description product_price product_image.secure_url"
-                )
-                .sort(sortByPrice)
-                .limit(limit)
-                .skip(skip);
-
-            return res.status(200).json({ count: count, offers: result });
-        } catch (err) {
-            return res.status(400).json({ error: err.message });
+            res.status(200).json({ count: count, offers: offers });
+        } catch (error) {
+            res.status(400).json({ error: error.message });
         }
     } else {
         try {
             const offers = await Offer.find()
-            return res.status(200).json(offers)
+            res.status(200).json(offers)
         } catch (error) {
-            return res.status(400).json({ error: error.message });
+            res.status(400).json({ error: error.message });
         }
     }
 });
