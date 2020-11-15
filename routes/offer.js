@@ -59,7 +59,7 @@ router.post("/offer/publish", isAuthenticated, async (req, res) => {
                     // tous les uploads sont terminés, on peut donc envoyer la réponse au client
                     newOffer.pictures = results;
                     await newOffer.save()
-                    return res.json(results);
+                    return res.json(newOffer);
                 }
                 // console.log(results.push(result));
 
