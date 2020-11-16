@@ -157,7 +157,7 @@ router.put("/offer/update", isAuthenticated, async (req, res) => {
 router.get("/offers", async (req, res) => {
     const { title, priceMin, priceMax, page, sort } = req.query;
     console.log(req.query);
-    if (req.query.length >= 1) {
+    if (req.query.length >= 1 && title) {
         console.log('in');
         try {
             let pages = Number(page);
