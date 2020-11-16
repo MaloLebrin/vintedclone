@@ -14,6 +14,8 @@ const Offer = require("../model/Offer");
 const isAuthenticated = require("../middleware/isAuthenticated");
 
 router.post("/offer/publish", isAuthenticated, async (req, res) => {
+    console.log('fields', req.fields)
+    console.log('files', req.files.pictures);
     try {
         const {
             description,
@@ -154,8 +156,9 @@ router.put("/offer/update", isAuthenticated, async (req, res) => {
 
 router.get("/offers", async (req, res) => {
     const { title, priceMin, priceMax, page, sort } = req.query;
-    if (req.query) {
-
+    console.log(req.query);
+    if (req.query.length >= 1) {
+        console.log('in');
         try {
             let pages = Number(page);
             let limit = Number(req.query.limit); // pour rendre dynamique limite
@@ -179,16 +182,18 @@ router.get("/offers", async (req, res) => {
                 .skip((pages - 1) * limit);
             const count = await Offer.countDocuments(offers); // pour gérer la nombre de doc dans la recherche
 
-            res.status(200).json({ count: count, offers: offers });
+            return res.status(200).json({ count: count, offers: offers });
         } catch (error) {
-            res.status(400).json({ error: error.message });
+            return res.status(400).json({ error: error.message });
         }
     } else {
         try {
+            console.log('ou query');
             const offers = await Offer.find()
-            res.status(200).json(offers)
+            const count = await Offer.countDocuments(offers); // pour gérer la nombre de doc dans la recherche
+            return res.status(200).json({ count: count, offers: offers });
         } catch (error) {
-            res.status(400).json({ error: error.message });
+            return res.status(400).json({ error: error.message });
         }
     }
 });

@@ -5,9 +5,8 @@ const isAuthenticated = async (req, res, next) => {
         const user = await User.findOne({ token: token }).select(
             "account _id token" //champ qui nous interesse dans un string avec un espace entre chaque champ.
         ); // le select permettrai d'isoler certaines clefs et doncc leur valeurs pour par exemple ne pas renvoyer le hash et le salt
-        console.log(user);
         if (!user) {
-            return res.status(401).json({ error: "non " });
+            return res.status(401).json({ error: "user not found" });
         } else {
             req.user = user;
             return next();
