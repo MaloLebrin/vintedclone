@@ -189,7 +189,10 @@ router.get("/offers", async (req, res) => {
     } else {
         try {
             console.log('ou query');
-            const offers = await Offer.find()
+            const offers = await Offer.find().populate({
+                path: "owner",
+                select: "account",
+            })
             const count = await Offer.countDocuments(offers); // pour gérer la nombre de doc dans la recherche
             return res.status(200).json({ count: count, offers: offers });
         } catch (error) {
