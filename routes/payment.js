@@ -33,10 +33,15 @@ router.post("/payment", isAuthenticated, async (req, res) => {
             })
             console.log("après nouvelle commande avant save");
             await newOrder.save()
+            console.log('après save new order');
             const user = await User.findById(req.user._id)
+            console.log('après find user');
             user.orders.push(newOrder._id)
+            console.log("après push new order to user");
             await user.save()
+            console.log("après user save");
             await Offer.findByIdAndDelete(id)
+            console.log("après delete offer");
             return res.json({
                 response: response,
                 order: newOrder
