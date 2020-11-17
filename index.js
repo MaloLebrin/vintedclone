@@ -12,16 +12,20 @@ app.use(
 );
 app.use(cors());
 
-mongoose.connect(process.env.MONGODB_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-});
+mongoose.connect(process.env.MONGODB_URL,
+    // "mongodb://localhost:27017/vinted",
+    {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useCreateIndex: true,
+    });
 
 const userRoutes = require("./routes/user");
 const offerRoutes = require("./routes/offer");
+const paymentRoutes = require("./routes/payment");
 app.use(userRoutes);
 app.use(offerRoutes);
+app.use(paymentRoutes);
 app.get('/', (req, res) => {
     res.send("it's working");
 })
