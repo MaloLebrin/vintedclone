@@ -18,7 +18,7 @@ router.post("/payment", isAuthenticated, async (req, res) => {
         console.log("avant if");
         if (offer) {
             const response = await stripe.charges.create({
-                amount: (offer.product_price || amount) * 100,
+                amount: offer.product_price * 100,
                 currency: "eur",
                 description: `Paiement vinted pour : ${title}`,
                 source: token,
@@ -26,7 +26,7 @@ router.post("/payment", isAuthenticated, async (req, res) => {
             console.log("aaprès stripe avant nouvelle commande");
             const newOrder = await new Order({
                 date: new Date(),
-                amount: offer.product_price || amount,
+                amount: offer.product_price,
                 delivery: false,
                 products: id,
                 user: req.user._id,
