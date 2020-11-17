@@ -15,6 +15,7 @@ router.post("/payment", isAuthenticated, async (req, res) => {
         //alller chercher le prix du produit en base de donnée en utilisant l'id du produit
         const { token, title, id, amount } = req.fields
         const offer = await Offer.findById(id)
+        console.log("avant if");
         if (offer) {
             const response = await stripe.charges.create({
                 amount: (offer.product_price || amount) * 100,
@@ -22,6 +23,7 @@ router.post("/payment", isAuthenticated, async (req, res) => {
                 description: `Paiement vinted pour : ${title}`,
                 source: token,
             });
+            console.log("aaprès stripe avant nouvelle commande");
             const newOrder = await new Order({
                 date: new Date(),
                 amount: offer.product_price || amount,
@@ -29,6 +31,7 @@ router.post("/payment", isAuthenticated, async (req, res) => {
                 products: id,
                 user: req.user._id,
             })
+            console.log("après nouvelle commande avant save");
             await newOrder.save()
             const user = await User.findById(req.user._id)
             user.orders.push(newOrder._id)
