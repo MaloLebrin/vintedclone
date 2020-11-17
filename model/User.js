@@ -16,6 +16,12 @@ const User = mongoose.model("User", {
     token: String,
     hash: String,
     salt: String,
+    orders: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Order"
+        }
+    ]
 });
 
 module.exports = User;
