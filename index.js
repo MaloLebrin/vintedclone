@@ -3,7 +3,7 @@ const formidable = require("express-formidable");
 const mongoose = require("mongoose");
 const app = express();
 const cors = require("cors");
-require("dotenv").config;
+require("dotenv").config();
 
 app.use(
     formidable({
